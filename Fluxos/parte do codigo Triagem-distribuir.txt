@@ -1,0 +1,20 @@
+    var p = new Object();
+    
+    p['id_servico'] = id_servico;
+    p['id_prio'] = id_prio;
+    p['client_name'] = document.getElementById("client_name").value;
+    p['client_ident'] = document.getElementById("client_ident").value;
+
+    var callbackOk = function() {
+
+        //1 se impressão está ativa
+        if (status_imp == 1) {
+
+            var testwindow = window.open(TRIAG_PATH + "acoes/imprimir_senha.php", "mywindow", "location=0,status=0,scrollbars=0,width=300,height=170");
+            testwindow.moveTo(0,0);
+        }
+    
+        location.href = '?mod=sga.triagem';
+    }
+
+    SGA.executaOperacao(TRIAG_PATH + "acoes/distribuir_senha.php", "POST", Ajax.encodePostParameters(p), callbackOk)

@@ -1,0 +1,230 @@
+Fluxo do click no menu "Config Global >> Grupos"
+
+javascript:Configuracao.alterarConteudo('grupos/index.php', 'Configuracao.onLoadGrupos');
+
+Ajax.simpleLoad("?redir=modules/sga/configuracao/grupos/index.php", 'template_conteudo', "POST", '', true, "Configuracao.onLoadGrupos");
+
+Ajax.simpleLoad = function(url, id, method, params, loading, c, p) {
+    var targetList = new TargetList();
+    targetList.add(new Target('template_conteudo'));
+    targetList.add(new ParametrizedCallbackTarget("Configuracao.onLoadGrupos", undefined));
+
+    if (true) {
+        window.createLoading('template_conteudo');
+    }
+
+    var ajax = new Ajax("?redir=modules/sga/configuracao/grupos/index.php", targetList);
+    ajax.setMethod("POST");
+    ajax.setShowLoading(true);
+    ajax.setParameters('');
+    ajax.load();
+}
+
+
+var Target = function('template_conteudo') {
+
+    var self = this;
+    this.id = 'template_conteudo';
+    
+    this.getId = function() {
+        return self.id;
+    }
+
+    this.load = function(content) {
+        var tag = null;
+        if (self.getId() != "") {
+            tag = $("#"+self.getId()).get(0);
+            if (tag != null) {
+                tag.innerHTML = content;
+            }
+        }
+        else {
+            if (content != null && content != '') {
+                tag = window.popup("response_popup");
+                tag.innerHTML = content;
+                $("body").get(0).appendChild(tag);
+            }
+        }
+
+        if (tag != null) {
+            var popup = window.getParentPopup(tag);
+            if (popup) {
+                $(popup).dialog( 'option' , 'position' , 'center' );
+                $(popup).dialog( 'option' , 'width' , 'auto' );
+                window.refreshPopupTitle(popup);
+            }
+        }
+        SGA.loadComponentes();
+    }
+
+}
+
+//callback = "Configuracao.onLoadGrupos"
+//param = undefined
+var ParametrizedCallbackTarget = function(callback, param) {
+
+    var self = this;
+
+    this.callback = Configuracao.onLoadGrupos;
+    this.param = "undefined";
+
+    this.getCallback = function() {
+        return self.Configuracao.onLoadGrupos;
+    }
+
+    this.load = function(content) {
+        if (typeof self.param == "undefined") {
+            if (self.callback !=null){
+            	self.callback();
+            }
+        }
+        else {
+        	if (self.Configuracao.onLoadGrupos !=null){
+        		self.Configuracao.onLoadGrupos(undefined);
+        	}
+        }
+    }
+}
+
+var TargetList = function() {
+
+    var self = this;
+
+    this.queue = new Array();
+
+    this.add = function(ajax) {
+        self.queue.push(ajax);
+    }
+
+    this.shift = function() {
+        return self.queue.shift();
+    }
+
+    this.isEmpty = function() {
+        return self.queue.length == 0;
+    }
+
+    this.load = function(content) {
+        while (!self.isEmpty()) {
+            self.shift().load(content);
+        }
+    }
+}
+
+//var ajax = new Ajax("?redir=modules/sga/configuracao/grupos/index.php", targetList);
+//ajax.setMethod("POST");
+//ajax.setShowLoading(true);
+//ajax.setParameters('');
+//ajax.load();
+var Ajax = function(url, t) {
+
+    var self = this;
+
+    this.url = url;
+    this.target = t;
+    
+    this.xmlhttp = null;
+    this.method = "GET";
+    this.parameters = "";
+    this.showLoading = false;
+    this.callback = undefined;
+    this.callbackParam = undefined;
+
+    this.getURL = function() {
+        return self.url;
+    }
+
+    this.setMethod = function(m) {
+        self.method = m;
+    }
+
+    this.getMethod = function() {
+        return self.method;
+    }
+
+    this.setParameters = function(p) {
+        self.parameters = p;
+    }
+
+    this.getParameters = function() {
+        return self.parameters;
+    }
+
+    this.setShowLoading = function(b) {
+        self.showLoading = (b == true);
+    }
+
+    this.setCallback = function(c) {
+        self.callback = c;
+    }
+
+    this.getCallback = function() {
+        return self.callback;
+    }
+
+    this.setCallbackParam = function(p) {
+    	self.callbackParam = p;
+    }
+
+    this.getCallbackParam = function() {
+        return self.callbackParam;
+    }
+    
+    this.createObjectRequest = function() {
+        var xml = null;
+	    if (window.XMLHttpRequest)
+		    xml = new XMLHttpRequest();
+	    else if (window.ActiveXObject)
+		    xml = new ActiveXObject("Microsoft.XMLHTTP");
+        return xml;
+    }
+    
+    this.getTarget = function() {
+        return self.target;
+    }    
+    
+    this.getUrlVars = function() {
+	    var url = window.location.href;
+	    vars = url.split("?")[1];
+	    return vars;
+    }
+
+    this.load = function() {
+        var xmlhttp = self.createObjectRequest();
+        var target = self.getTarget();
+
+        if (xmlhttp != null) {
+	        xmlhttp.onreadystatechange = function() {
+		        if (xmlhttp.readyState == 4) {
+	                if (xmlhttp.status == 200) {
+                        window.removeLoading();
+                        
+	                    target.load(xmlhttp.responseText);
+
+		                if (self.callback !== undefined) {
+		                	self.callback(self.callbackParam);
+		                }
+	                }
+                    else if (xmlhttp.status != 0) {
+                        alert("ERROR\nHTTP STATUS: "+xmlhttp.status+"\nURL: "+self.getURL());
+                    }
+                }
+	        }
+	        var method = self.getMethod();
+	        if (method == "GET") {
+    	        xmlhttp.open(method, self.getURL(), true);
+	            xmlhttp.send(null);
+	        }
+	        else if (method == "POST") {
+	            var p = self.getParameters();
+	            xmlhttp.open(method, self.getURL(), true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.setRequestHeader("Content-length", p.length);
+                xmlhttp.setRequestHeader("Connection", "close");
+                xmlhttp.send(p);
+	        }
+	        return true;
+	    }
+        return false;
+    }
+}

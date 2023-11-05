@@ -1,0 +1,15 @@
+var popup = window.popup("tgm_confirmar_prioridade");
+
+    var id_prio;
+	
+    //verificar qual prioridade foi selecionada se senha for do tipo prioridade
+    for (var i = 0; i < document.forms['id_prio_sel'].id_prioridade.length; i++) {
+        if (document.forms['id_prio_sel'].id_prioridade[i].checked) {
+            id_prio = document.forms['id_prio_sel'].id_prioridade[i].value;
+            var p = new Object();
+            p['id_servico'] = id_servico;
+            p['id_prio'] = id_prio;
+			
+            Ajax.simpleLoad(TRIAG_PATH + "acoes/confirmar_prioridade.php",  popup.getAttribute("id"), "POST", Ajax.encodePostParameters(p), false, Triagem.seleciona, 'confirmar_prioridade');
+        }
+    }	

@@ -1,0 +1,13 @@
+precisei configurar o linux
+precisei configurar o servidor de banco de dados postgresql
+precisei configurar o servidor de banco de dados mysql
+precisei configurar um servidor ftp (vsftpd)
+precisei configurar um servidor web (apache)
+#precisei configurar as permissões do linux
+precisei modificar alguns scripts php
+
+alguns dos comandos utilizados:
+sudo chmod 755 /caminho/diretorio
+sudo chmod 644 /caminho/arquivo
+sudo chown root:root /caminho
+sudo /etc/init.d/apache2 restart
